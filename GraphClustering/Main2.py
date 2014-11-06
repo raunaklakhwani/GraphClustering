@@ -5,8 +5,8 @@ import json
 import random
 
 finalClusters = []
-numberOfNodes = 2500
-numberOfLinks = 7500
+numberOfNodes = 500
+numberOfLinks = 1000
 width = 800
 height = 800
 nodeSet = []
