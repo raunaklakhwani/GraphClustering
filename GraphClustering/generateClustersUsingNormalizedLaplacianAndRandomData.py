@@ -15,18 +15,55 @@ nodeSet = []
 nodeSetId = numberOfNodes
 nodesDict = {}
 linksDict = {}
+threshold = 2
 
 inputFileName = "/Users/ronaklakhwani/Desktop/comparision/sampleData/data/data_800.json"
 
 
 def getVolume(cluster):
     volume = 0
+    for node in cluster:
+        connectedVertices = linksDict[node]
+        for vertex in connectedVertices :
+            if vertex in cluster:
+                volume = volume + 1
     return volume
 
-def checkQuality(cluster1,cluster2):
+
+def getCut(cluster1, cluster2):
+    cut = 0
+    if len(cluster1) > len(cluster2) :
+        for node in cluster2 :
+            connectedVertices = linksDict[node]
+            for vertex in connectedVertices :
+                if vertex in cluster1 :
+                    cut = cut + 1
+    else :
+        for node in cluster1 :
+            connectedVertices = linksDict[node]
+            for vertex in connectedVertices :
+                if vertex in cluster2 :
+                    cut = cut + 1
+    return cut
+
+def checkQuality(cluster1, cluster2):
     volume1 = getVolume(cluster1)
     volume2 = getVolume(cluster2)
-    return True
+    normalized_cut = 0
+    if volume1 == 0 :
+        print cluster1
+    if volume2 == 0 :
+        print cluster2
+    cut = getCut(cluster1, cluster2)
+    if volume1 != 0 and volume2 != 0 :
+        normalized_cut = (cut/float(volume1)) + (cut/float(volume2))
+    print "cluster 1 = ", len(cluster1), " cluster 2 = ", len(cluster2), " normalized_cut = ",normalized_cut
+    print cluster1
+    print cluster2
+    if normalized_cut < threshold and (volume1!=0 and volume2!=0) :
+        return True
+    else :
+        return False
 
 
 
@@ -128,6 +165,7 @@ def getClusters(nodes, links) :
         sIndex = nodeIds.index(link['source']['id'])
         tIndex = nodeIds.index(link['target']['id'])
         if sIndex == tIndex :
+            print 'hello'
             degreeArray[tIndex] += 2
         else :
             degreeArray[tIndex] += 1
@@ -164,16 +202,23 @@ def getClusters(nodes, links) :
             else :
                 cluster2.append(nodeIds[i])
                 
+    
+                
         # clusters = {}
         # clusters['cluster1'] = cluster1
         # clusters['cluster12'] = cluster2
         # clusters['adj'] = adj
         # clusters['nodeIds'] = nodeIds
         if len(cluster1) != 0 and len(cluster2) != 0 :
-            clusters = []
-            clusters.append(cluster1);
-            clusters.append(cluster2);
-            clusters.append("OK")
+            if checkQuality(cluster1, cluster2) : 
+                clusters = []
+                clusters.append(cluster1);
+                clusters.append(cluster2);
+                clusters.append("OK")
+            else :
+                clusters = []
+                clusters.append(nodes)
+                clusters.append("DONE_POOR")
         else :
             clusters = []
             clusters.append(cluster1 if len(cluster1) != 0 else cluster2);
@@ -241,7 +286,7 @@ if __name__ == '__main__' :
     
     
     
-    #generateData(numberOfNodes, numberOfLinks, width, height, inputDir + fileName)
+    # generateData(numberOfNodes, numberOfLinks, width, height, inputDir + fileName)
     
     with open(inputFileName) as f:
         catalog = json.load(f)
