@@ -15,7 +15,7 @@ nodeSet = []
 nodeSetId = numberOfNodes
 nodesDict = {}
 linksDict = {}
-threshold = 2
+threshold = 3
 
 inputFileName = "/Users/ronaklakhwani/Desktop/comparision/sampleData/data/data_800.json"
 
@@ -232,38 +232,27 @@ def getClusters(nodes, links) :
 
 def graphClustering(nodes, links, nodeSetIdInfo) :
     global nodeSetId 
-    if len(nodes) >= 5 :
-        clusters = getClusters(nodes, links);
-        result = clusters.pop()
-        if result == "OK" :
-            for cluster in clusters :
-                clusterLinks = [i for i in links if i['source']['id'] in cluster and i['target']['id'] in cluster]
-                dummyNodeSetIdInfo = [] 
-                graphClustering(cluster, clusterLinks, dummyNodeSetIdInfo)
-                if len(dummyNodeSetIdInfo) > 1 :
-                    aDict = {}
-                    aDict['id'] = nodeSetId + 1
-                    nodeSetId = nodeSetId + 1
-                    aDict['type'] = 'nodeSet'
-                    aDict['nodes'] = dummyNodeSetIdInfo
-                    aDict['x'] = random.randrange(0, width)
-                    aDict['y'] = random.randrange(0, height)
-                    nodeSet.append(aDict)
-                    nodeSetIdInfo.append(nodeSetId)
-                elif len(dummyNodeSetIdInfo) == 1 :
-                    nodeSetIdInfo.append(dummyNodeSetIdInfo[0])
-        else :
-            aDict = {}
-            aDict['id'] = nodeSetId + 1
-            nodeSetId = nodeSetId + 1
-            aDict['type'] = 'nodeSet'
-            aDict['nodes'] = nodes
-            aDict['x'] = random.randrange(0, width)
-            aDict['y'] = random.randrange(0, height)
-            nodeSet.append(aDict) 
-            finalClusters.append(clusters.pop())
-            nodeSetIdInfo.append(nodeSetId)
-    else : 
+    
+    clusters = getClusters(nodes, links);
+    result = clusters.pop()
+    if result == "OK" :
+        for cluster in clusters :
+            clusterLinks = [i for i in links if i['source']['id'] in cluster and i['target']['id'] in cluster]
+            dummyNodeSetIdInfo = [] 
+            graphClustering(cluster, clusterLinks, dummyNodeSetIdInfo)
+            if len(dummyNodeSetIdInfo) > 1 :
+                aDict = {}
+                aDict['id'] = nodeSetId + 1
+                nodeSetId = nodeSetId + 1
+                aDict['type'] = 'nodeSet'
+                aDict['nodes'] = dummyNodeSetIdInfo
+                aDict['x'] = random.randrange(0, width)
+                aDict['y'] = random.randrange(0, height)
+                nodeSet.append(aDict)
+                nodeSetIdInfo.append(nodeSetId)
+            elif len(dummyNodeSetIdInfo) == 1 :
+                nodeSetIdInfo.append(dummyNodeSetIdInfo[0])
+    else :
         aDict = {}
         aDict['id'] = nodeSetId + 1
         nodeSetId = nodeSetId + 1
@@ -271,10 +260,9 @@ def graphClustering(nodes, links, nodeSetIdInfo) :
         aDict['nodes'] = nodes
         aDict['x'] = random.randrange(0, width)
         aDict['y'] = random.randrange(0, height)
-        nodeSet.append(aDict)
-        nodeSetIdInfo.append(nodeSetId)
-        finalClusters.append(nodes)
-            
+        nodeSet.append(aDict) 
+        finalClusters.append(clusters.pop())
+        nodeSetIdInfo.append(nodeSetId)            
 
 
 
