@@ -4,6 +4,7 @@ from numpy import linalg
 import json
 import random
 import math
+from sets import Set
 
 finalClusters = []
 numberOfNodes = 500
@@ -15,25 +16,37 @@ nodeSetId = numberOfNodes
 nodesDict = {}
 linksDict = {}
 
-inputFileName = "/Users/ronaklakhwani/Desktop/comparision/sampleData/data/testData.json"
+inputFileName = "/Users/ronaklakhwani/Desktop/comparision/sampleData/data/data_800.json"
+
+
+def getVolume(cluster):
+    volume = 0
+    return volume
+
+def checkQuality(cluster1,cluster2):
+    volume1 = getVolume(cluster1)
+    volume2 = getVolume(cluster2)
+    return True
+
+
 
 def generateLinksDictionary(links):
     linksDict = {}
     for link in links:
-        source = link['source']
-        target = link['target']
+        source = link['source']['id']
+        target = link['target']['id']
         sourceDict = linksDict.get(source)
         if sourceDict :
-            sourceDict.append(target)
+            sourceDict.add(target)
         else :
-            sourceDict = [target]
+            sourceDict = Set([target])
             linksDict[source] = sourceDict
         
         targetDict = linksDict.get(target)
         if targetDict :
-            targetDict.append(source)
+            targetDict.add(source)
         else :
-            targetDict = [source]
+            targetDict = Set([source])
             linksDict[target] = targetDict    
         
             
@@ -94,7 +107,7 @@ def isEdge(source, target):
     sourceDict = linksDict.get(source)
     if sourceDict :
         try :
-            if sourceDict.index(target) >= 0 :
+            if target in sourceDict  :
                 return True
         except ValueError:
             return False
@@ -112,8 +125,8 @@ def getClusters(nodes, links) :
     degreeArray = numpy.zeros(size)
 
     for link in links:
-        sIndex = nodeIds.index(link['source'])
-        tIndex = nodeIds.index(link['target'])
+        sIndex = nodeIds.index(link['source']['id'])
+        tIndex = nodeIds.index(link['target']['id'])
         if sIndex == tIndex :
             degreeArray[tIndex] += 2
         else :
@@ -179,7 +192,7 @@ def graphClustering(nodes, links, nodeSetIdInfo) :
         result = clusters.pop()
         if result == "OK" :
             for cluster in clusters :
-                clusterLinks = [i for i in links if i['source'] in cluster and i['target'] in cluster]
+                clusterLinks = [i for i in links if i['source']['id'] in cluster and i['target']['id'] in cluster]
                 dummyNodeSetIdInfo = [] 
                 graphClustering(cluster, clusterLinks, dummyNodeSetIdInfo)
                 if len(dummyNodeSetIdInfo) > 1 :
