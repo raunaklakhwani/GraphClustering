@@ -208,23 +208,25 @@ if __name__ == '__main__' :
     #print finalClusters
     print len(finalClusters)
     
-    #dictNodes = {}
-    #for node in nodes : 
-    #    dictNodes[node['id']] = node
+    dictNodes = {}
+    for node in nodes : 
+        dictNodes[node['id']] = node
     #===========================================================================
-    # global nodeSetId
-    # nodeSet = []
-    # for cluster in finalClusters :
-    #     aDict = {}
-    #     aDict['id'] = nodeSetId + 1
-    #     aDict['type'] = 'nodeSet'
-    #     aDict['nodes'] = cluster
-    #     aDict['x'] = random.randrange(0,width)
-    #     aDict['y'] = random.randrange(0,height)
-    #     print len(cluster)
-    #     nodeSet.append(aDict)
-    #     nodeSetId = nodeSetId + 1
-    # print nodeSet
+    global nodeSetId
+    nodeSet = []
+    for cluster in finalClusters :
+        aDict = {}
+        aDict['id'] = nodeSetId + 1
+        aDict['type'] = 'nodeSet'
+        aDict['nodes'] = cluster
+        aDict['x'] = random.randrange(0,width)
+        aDict['y'] = random.randrange(0,height)
+        aDict['x'] = dictNodes[cluster[0]]['x']
+        aDict['y'] = dictNodes[cluster[0]]['y']
+        print len(cluster)
+        nodeSet.append(aDict)
+        nodeSetId = nodeSetId + 1
+    print nodeSet
     #===========================================================================
     f = open(outputDir + fileName,"w+")
     fileData = {'nodes' : nodes, 'links' : links, 'nodeSet': nodeSet} 
